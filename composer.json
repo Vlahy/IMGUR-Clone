@@ -3,5 +3,8 @@
     "psr-4": {
       "App\\": "./"
     }
+  },
+  "require": {
+    "bramus/router": "~1.6"
   }
 }
