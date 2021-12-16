@@ -2,14 +2,29 @@
 
 namespace Config;
 
+require 'config.php';
+
 use PDO;
 use PDOException;
 
-include 'config.php';
-
 class Database
 {
-    protected $conn;
+
+    /**
+     * Database connection parameters
+     * Edit them in config.php file
+     *
+     * @var $conn
+     * @var $db_host
+     * @var $db_name
+     * @var $db_user
+     * @var $db_pass
+     */
+    protected $conn = null;
+    protected string $db_host = DB_HOST;
+    protected string $db_name = DB_NAME;
+    protected string $db_user = DB_USER;
+    protected string $db_pass = DB_PASS;
 
     /**
      * Database connection
@@ -20,20 +35,16 @@ class Database
     {
         $this->conn = null;
 
-        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME;
+        $dsn = "mysql:host=" . $this->db_host . ";dbname=" . $this->db_name;
 
         try {
-
-            $this->conn = new PDO($dsn, DB_USER, DB_PASS);
+            $this->conn = new PDO($dsn, $this->db_user, $this->db_pass);
             $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
         }catch (PDOException $e){
-
             return json_encode([
                 'error' => $e->getMessage(),
             ]);
-
         }
 
         return $this->conn;

@@ -1,11 +1,13 @@
 {
   "autoload": {
     "psr-4": {
-      "App\\": "./"
+      "App\\": "app",
+      "Config\\": "config"
     }
   },
   "require": {
     "bramus/router": "~1.6",
-    "ext-json": "*"
+    "ext-json": "*",
+    "ext-pdo": "*"
   }
 }

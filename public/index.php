@@ -1,4 +1,4 @@
 <?php
 
 include '../vendor/autoload.php';
-include '../routes/routes.php';
+include '../routes/web.php';

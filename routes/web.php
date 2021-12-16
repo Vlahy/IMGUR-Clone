@@ -1,10 +1,12 @@
 <?php
 
-use Bramus\Router\Router;
+require_once '../vendor/autoload.php';
 
+use Bramus\Router\Router;
+require_once '../app/Controllers/TestController.php';
 $router = new Router();
 
-$router->setBasePath('/');
+//$router->setBasePath('/');
 
 // Custom 404 Handler
 $router->set404(function () {
@@ -18,14 +20,12 @@ $router->set404(function () {
     echo json_encode($jsonArray);
 });
 
-// Setting header for GET methods
-$router->before('GET', '/.*', function () {
-    header('Content-Type: application/json');
-});
 
 $router->get('/', function () {
-    echo 'hi';
 });
+
+
+$router->get('/test', 'App\Controllers\TestController@show');
 
 $router->get('/bla', function () {
     echo 'hello from something';
