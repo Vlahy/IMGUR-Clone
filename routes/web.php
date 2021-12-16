@@ -24,11 +24,16 @@ $router->set404(function () {
 $router->get('/', function () {
 });
 
+$router->post('/users/register', 'App\Controllers\UserController@register');
 
-$router->get('/test', 'App\Controllers\TestController@show');
+$router->get('/login', function () {
+    echo 'hi from login';
+});
 
-$router->get('/bla', function () {
-    echo 'hello from something';
+$router->get('/users/register', 'App\Controllers\UserController@register');
+
+$router->get('/test', function () {
+    echo 'test';
 });
 
 $router->run();
