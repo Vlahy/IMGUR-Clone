@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Config\Database;
+use PDO;
 
 class UserModel
 {
@@ -31,9 +32,9 @@ class UserModel
         $stmt->bindValue(':api_key', base64_encode('secret'));
         $stmt->bindValue(':role', 'user');
 
-        if ($stmt->execute()){
+        if ($stmt->execute()) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -51,9 +52,9 @@ class UserModel
         $stmt = $db->prepare($query);
         $stmt->bindValue(':username', $username);
         $stmt->execute();
-        if ($stmt->rowCount() > 0){
+        if ($stmt->rowCount() > 0) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -71,11 +72,44 @@ class UserModel
         $stmt = $db->prepare($query);
         $stmt->bindValue(':email', $email);
         $stmt->execute();
-        if ($stmt->rowCount() > 0){
+        if ($stmt->rowCount() > 0) {
             return true;
-        }else{
+        } else {
             return false;
         }
+    }
+
+    /**
+     * Method for logging in users
+     *
+     * @param $email
+     * @param $password
+     * @return false|mixed|object
+     */
+    public function login($email, $password)
+    {
+        $db = $this->conn->getConnection();
+        $query = "SELECT * FROM user WHERE email = :email";
+
+        $stmt = $db->prepare($query);
+
+        $stmt->bindValue(':email', $email);
+
+        $stmt->execute();
+
+        $row = $stmt->fetchObject();
+
+        if (!empty($row)) {
+
+            $hashedPassword = $row->password;
+
+            if (password_verify($password, $hashedPassword)) {
+                return $row;
+            } else {
+                return false;
+            }
+        }
+        return false;
     }
 
 }

@@ -26,13 +26,13 @@ $router->get('/', function () {
 
 $router->post('/users/register', 'App\Controllers\UserController@register');
 
-$router->get('/login', function () {
-    echo 'hi from login';
-});
-
 $router->get('/users/register', 'App\Controllers\UserController@register');
 
-$router->get('/test', function () {
+$router->get('/users/login', 'App\Controllers\UserController@login');
+
+$router->post('/users/login', 'App\Controllers\UserController@login');
+
+$router->get('/dashboard', function () {
     echo 'test';
 });
 
