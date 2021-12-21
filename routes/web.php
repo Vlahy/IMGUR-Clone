@@ -1,12 +1,10 @@
 <?php
 
-require_once '../vendor/autoload.php';
-
 use Bramus\Router\Router;
-require_once '../app/Controllers/TestController.php';
+
 $router = new Router();
 
-//$router->setBasePath('/');
+$router->setBasePath('/');
 
 // Custom 404 Handler
 $router->set404(function () {
@@ -22,18 +20,25 @@ $router->set404(function () {
 
 
 $router->get('/', function () {
+    require_once '../config/config.php';
+    require_once '../app/Views/WelcomeView.php';
 });
 
-$router->post('/users/register', 'App\Controllers\UserController@register');
+$router->match('GET|POST','/users/register', 'App\Controllers\AuthController@register');
 
-$router->get('/users/register', 'App\Controllers\UserController@register');
+$router->match('GET|POST', '/users/login', 'App\Controllers\AuthController@login');
 
-$router->get('/users/login', 'App\Controllers\UserController@login');
-
-$router->post('/users/login', 'App\Controllers\UserController@login');
+$router->get('/users/logout', 'App\Controllers\AuthController@logout');
 
 $router->get('/dashboard', function () {
-    echo 'test';
+    require_once '../config/config.php';
+    require_once HEADER;
+    require_once NAVIGATION;
+    if (isset($_SESSION['user_id'])){
+        echo json_encode($_SESSION);
+    }
 });
+
+$router->get('/users/profile', 'App\Controllers\UserController@show');
 
 $router->run();

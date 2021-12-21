@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 
-class UserController extends BaseController
+class AuthController extends BaseController
 {
 
     private UserModel $userModel;
@@ -193,7 +193,7 @@ class UserController extends BaseController
         $_SESSION['username'] = $user->username;
         $_SESSION['email'] = $user->email;
         $_SESSION['role'] = $user->role;
-        header('location: /dashboard');
+        header('location: /users/profile');
     }
 
     /**

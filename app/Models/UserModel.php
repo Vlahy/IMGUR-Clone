@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Enums\UserRoleData as Role;
 use Config\Database;
-use PDO;
 
-class UserModel
+class UserModel implements Role
 {
 
-    private $conn;
+    private Database $conn;
 
     public function __construct()
     {
@@ -30,7 +30,7 @@ class UserModel
         $stmt->bindValue(':email', $data['email']);
         $stmt->bindValue(':password', $data['password']);
         $stmt->bindValue(':api_key', base64_encode('secret'));
-        $stmt->bindValue(':role', 'user');
+        $stmt->bindValue(':role', Role::ROLES[self::USER]);
 
         if ($stmt->execute()) {
             return true;

@@ -1,0 +1,80 @@
+:root {
+    --typewriterSpeed: 6s;
+    --typewriterCharacters: 17;
+}
+
+body{
+    height: 100%;
+}
+
+.custom-wrapper{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-h1{
+    margin: 0;
+    padding: 0;
+    position: relative;
+    top: -15%;
+    font-size: 5em;
+    font-family: "Source Code Pro" ,monospace;
+}
+
+.custom-h1::before,
+.custom-h1::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.custom-h1::before {
+    background: var(--bs-body-bg);
+    animation: typewriter var(--typewriterSpeed) steps(var(--typewriterCharacters)) 1s forwards;
+}
+
+.custom-h1::after {
+    width: 0.125em;
+    background: black;
+    animation: typewriter var(--typewriterSpeed) steps(var(--typewriterCharacters)) 1s forwards,
+                blink 750ms steps(var(--typewriterCharacters)) infinite;
+}
+
+.custom-p{
+    position: relative;
+    font-size: 2.5em;
+    font-weight: 400;
+    font-family: "Source Code Pro", monospace;
+    top: -10%;
+    opacity: 0;
+    transform: translateY(3rem);
+    animation: fadeInUp 2s ease calc(var(--typewriterSpeed) + 2s) forwards;
+}
+
+@keyframes typewriter {
+    to {
+        left: 100%;
+    }
+}
+
+@keyframes blink {
+    to {
+        background: transparent;
+    }
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

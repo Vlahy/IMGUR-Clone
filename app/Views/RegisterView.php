@@ -1,5 +1,6 @@
 <?php
 include __DIR__ . '../../Helpers/header.php';
+include __DIR__ . '../../Helpers/navigation.php';
 ?>
     <section class="vh-100" style="background-color: #eee;">
         <div class="container h-100">
