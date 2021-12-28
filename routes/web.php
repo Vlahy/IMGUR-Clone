@@ -39,6 +39,24 @@ $router->get('/dashboard', function () {
     }
 });
 
-$router->get('/users/profile', 'App\Controllers\UserController@show');
+$router->get('/users/profile/{id}', 'App\Controllers\GalleryController@index');
+
+$router->get('/users/gallery/{id}', 'App\Controllers\GalleryController@show');
+
+$router->get('/users/image/{id}', 'App\Controllers\ImageController@show');
+
+$router->post('/users/image/delete/{id}', 'App\Controllers\ImageController@delete');
+
+$router->post('/users/image/nsfw/{id}', 'App\Controllers\ImageController@setImageAsNsfw');
+
+$router->post('/users/image/hidden/{id}', 'App\Controllers\ImageController@setImageAsHidden');
+
+$router->post('/users/gallery/delete/{id}', 'App\Controllers\GalleryController@delete');
+
+$router->post('/users/gallery/nsfw/{id}', 'App\Controllers\GalleryController@setGalleryAsNsfw');
+
+$router->post('/users/gallery/hidden/{id}', 'App\Controllers\GalleryController@setGalleryAsHidden');
+
+//$router->get('/user');
 
 $router->run();

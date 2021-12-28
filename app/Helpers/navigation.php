@@ -4,19 +4,34 @@
     </div>
 
     <?php
+    $uri = $_SERVER['REQUEST_URI'];
 
     if (isset($_SESSION['user_id'])) {
-        echo '<div class="p-2">
-                <a class="btn btn-success btn-lg" href="' . LOGOUT_URL . '">Logout</a>
-              </div>';
+
+        if ($uri == '/users/profile/' . $_SESSION['user_id']) {
+            echo '
+                        <div class="p-2">
+                            <a class="btn btn-success btn-lg" href="' . HOME_URL . '">Home</a>
+                        </div>';
+        } else {
+            echo '
+                <div class="p-2">
+                    <a class="btn btn-success btn-lg" href="' . PROFILE_URL . '">Profile</a>
+                </div>
+                ';
+        }
+
+        echo '
+                <div class="p-2">
+                    <a class="btn btn-success btn-lg" href="' . LOGOUT_URL . '">Logout</a>
+                </div>';
     } else {
-        $uri = $_SERVER['REQUEST_URI'];
 
         switch ($uri) {
             case '/users/login':
                 echo '
                     <div class="p-2">
-                        <a class="btn btn-success btn-lg" href="http://localhost/">Home</a>
+                        <a class="btn btn-success btn-lg" href="' . HOME_URL . '">Home</a>
                     </div>
                     <div class="p-2">
                         <a class="btn btn-success btn-lg" href="' . REGISTER_URL . '">Register</a>
@@ -25,7 +40,7 @@
             case '/users/register':
                 echo '
                     <div class="p-2">
-                        <a class="btn btn-success btn-lg" href="http://localhost/">Home</a>
+                        <a class="btn btn-success btn-lg" href="' . HOME_URL . '">Home</a>
                     </div>
                     <div class="p-2">
                         <a class="btn btn-success btn-lg" href="' . LOGIN_URL . '">Login</a>

@@ -193,7 +193,7 @@ class AuthController extends BaseController
         $_SESSION['username'] = $user->username;
         $_SESSION['email'] = $user->email;
         $_SESSION['role'] = $user->role;
-        header('location: /users/profile');
+        header('location: /users/profile/' . $_SESSION['user_id']);
     }
 
     /**
