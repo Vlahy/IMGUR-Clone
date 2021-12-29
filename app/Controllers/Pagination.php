@@ -36,7 +36,7 @@ class Pagination
     {
         $start = 0;
         if ($this->getCurrentPage() > 1) {
-            return ($this->getCurrentPage() * $this->limit);
+            return ($this->getCurrentPage() * $this->limit - $this->limit());
         } else {
             return $start;
         }
