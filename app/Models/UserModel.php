@@ -112,4 +112,38 @@ class UserModel implements Role
         return false;
     }
 
+    /**
+     * Method for checking if user is logged in
+     *
+     * @param $id
+     * @return bool
+     */
+    public function isLoggedIn($id): bool
+    {
+        if (isset($_SESSION['user_id'])) {
+            return true;
+        }
+        return false;
+
+    }
+
+    /**
+     * Method for checking if user is author of content
+     *
+     * @param $id
+     * @return bool
+     */
+    public function isAuthor($id): bool
+    {
+        if ($this->isLoggedIn($id)) {
+            if ($_SESSION['user_id'] === $id) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+
+    }
+
 }
