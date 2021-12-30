@@ -100,7 +100,7 @@ if (isset($data) && $data != false && $data['info'] != null) {
                                value="<?php echo $result['name'] ?>">
                         <label for="description" class="form-label">Description</label>
                         <textarea rows="10" name="description" id="description" type="text"
-                                  class="form-control"><?php echo $result['description'] ?>"</textarea>
+                                  class="form-control"><?php echo $result['description'] ?></textarea>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
