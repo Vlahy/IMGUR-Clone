@@ -30,7 +30,7 @@ class ImageModel
         $stmt->bindValue(':id', $id);
 
         if ($stmt->execute()) {
-            return $stmt->fetch(PDO::FETCH_OBJ);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } else {
             return null;
         }

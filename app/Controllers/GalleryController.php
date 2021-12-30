@@ -13,6 +13,7 @@ class GalleryController extends BaseController
     private string $table = 'gallery';
     private LoggerController $logger;
     private UserModel $userModel;
+    private CommentController $comment;
 
     public function __construct()
     {
@@ -20,6 +21,7 @@ class GalleryController extends BaseController
         $this->pagination = new Pagination($this->table);
         $this->logger = new LoggerController();
         $this->userModel = new UserModel();
+        $this->comment = new CommentController();
     }
 
     /**
@@ -57,6 +59,7 @@ class GalleryController extends BaseController
 
         $data['gallery'] = $this->galleryModel->getOneGallery($id, $limit, $offset);
         $data['info'] = $this->galleryModel->getGalleryInfo($id);
+        $data['comment'] = $this->comment->getGalleryComment($id);
 
         $this->view('GalleryView', $data);
 

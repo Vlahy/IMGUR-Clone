@@ -61,6 +61,10 @@ $router->post('/users/gallery/update', 'App\Controllers\GalleryController@update
 
 $router->post('/users/image/update', 'App\Controllers\ImageController@update');
 
+$router->post('/users/gallery/comment', 'App\Controllers\CommentController@storeGalleryComment');
+
+$router->post('/users/image/comment', 'App\Controllers\CommentController@storeImageComment');
+
 //$router->get('/user');
 
 $router->run();

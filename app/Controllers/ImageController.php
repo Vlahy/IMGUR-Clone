@@ -11,12 +11,14 @@ class ImageController extends BaseController
     private ImageModel $imageModel;
     private LoggerController $logger;
     private UserModel $userModel;
+    private CommentController $comment;
 
     public function __construct()
     {
         $this->imageModel = new ImageModel();
         $this->logger = new LoggerController();
         $this->userModel = new UserModel();
+        $this->comment = new CommentController();
     }
 
     /**
@@ -37,18 +39,8 @@ class ImageController extends BaseController
             $hide = true;
         }
 
-        $image = $this->imageModel->getImage($id, $hide) ?? null;
-
-        if (isset($image) && $image != null) {
-            $data = [
-                'id' => $image->id,
-                'user_id' => $image->user_id,
-                'file_name' => $image->file_name,
-                'slug' => $image->slug,
-                'nsfw' => $image->nsfw,
-                'hidden' => $image->hidden,
-            ];
-        }
+        $data['image'] = $this->imageModel->getImage($id, $hide);
+        $data['comment'] = $this->comment->getImageComment($id);
 
         $this->view('ImageView', $data);
 
