@@ -19,9 +19,9 @@ class GalleryModel
     {
         $db = $this->conn->getConnection();
 
-        if ($hide === true){
+        if ($hide === true) {
             $query = "select * from gallery where user_id = :user_id and nsfw = 0 and hidden = 0 limit :limit offset :offset";
-        }else {
+        } else {
             $query = "select * from gallery where user_id = :user_id limit :limit offset :offset";
         }
 
@@ -57,6 +57,23 @@ class GalleryModel
         }
     }
 
+    public function getGalleryInfo($galleryId)
+    {
+        $db = $this->conn->getConnection();
+
+        $query = "select * from gallery where id = :galleryId";
+
+        $stmt = $db->prepare($query);
+
+        $stmt->bindValue(':galleryId', $galleryId);
+
+        if ($stmt->execute()) {
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            return false;
+        }
+    }
+
     public function deleteGallery($id): bool
     {
         $db = $this->conn->getConnection();
@@ -66,6 +83,25 @@ class GalleryModel
         $stmt = $db->prepare($query);
 
         $stmt->bindValue(':id', $id);
+
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    public function updateGalleryInfo($data): bool
+    {
+
+        $db = $this->conn->getConnection();
+
+        $stmt = $db->prepare("UPDATE gallery SET name = :name, description = :description WHERE id = :id");
+
+        $stmt->bindValue(':id', $data['id']);
+        $stmt->bindValue(':name', $data['name']);
+        $stmt->bindValue(':description', $data['description']);
 
         if ($stmt->execute()) {
             return true;

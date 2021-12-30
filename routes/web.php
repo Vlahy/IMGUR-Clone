@@ -57,6 +57,10 @@ $router->post('/users/gallery/nsfw/{id}', 'App\Controllers\GalleryController@set
 
 $router->post('/users/gallery/hidden/{id}', 'App\Controllers\GalleryController@setGalleryAsHidden');
 
+$router->post('/users/gallery/update', 'App\Controllers\GalleryController@update');
+
+$router->post('/users/image/update', 'App\Controllers\ImageController@update');
+
 //$router->get('/user');
 
 $router->run();

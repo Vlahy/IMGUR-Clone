@@ -19,9 +19,9 @@ class ImageModel
     {
         $db = $this->conn->getConnection();
 
-        if ($hide == true){
+        if ($hide == true) {
             $query = "SELECT * FROM image WHERE id = :id AND nsfw = 0 and hidden = 0";
-        }else{
+        } else {
             $query = "SELECT * FROM image WHERE id = :id";
         }
 
@@ -51,6 +51,22 @@ class ImageModel
         }
         return false;
 
+    }
+
+    public function updateImage($data): bool
+    {
+        $db = $this->conn->getConnection();
+
+        $stmt = $db->prepare('UPDATE image SET slug = :slug WHERE id = :id');
+
+        $stmt->bindValue(':slug', $data['slug']);
+        $stmt->bindValue(':id', $data['id']);
+
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function setAsNsfw($id): bool

@@ -27,6 +27,9 @@ class ImageController extends BaseController
      */
     public function show($id)
     {
+
+        $data = [];
+
         $user = $_SESSION['user_id'] ?? null;
         if ($this->userModel->isAuthor($user)){
             $hide = false;
@@ -36,14 +39,16 @@ class ImageController extends BaseController
 
         $image = $this->imageModel->getImage($id, $hide) ?? null;
 
-        $data = [
-          'id' => $image->id,
-          'user_id' => $image->user_id,
-          'file_name' => $image->file_name,
-          'slug' => $image->slug,
-          'nsfw' => $image->nsfw,
-          'hidden' => $image->hidden,
-        ];
+        if (isset($image) && $image != null) {
+            $data = [
+                'id' => $image->id,
+                'user_id' => $image->user_id,
+                'file_name' => $image->file_name,
+                'slug' => $image->slug,
+                'nsfw' => $image->nsfw,
+                'hidden' => $image->hidden,
+            ];
+        }
 
         $this->view('ImageView', $data);
 
@@ -54,9 +59,36 @@ class ImageController extends BaseController
         // TODO: Implement store() method.
     }
 
+    /**
+     * Method for updating image info
+     *
+     * @return false|string|void
+     */
     public function update()
     {
-        // TODO: Implement update() method.
+        $data = [
+            'id' => '',
+            'slug' => '',
+        ];
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+            $data = [
+                'id' => trim($_POST['id']),
+                'slug' => trim($_POST['slug']),
+            ];
+
+            try {
+                $this->imageModel->updateImage($data);
+                header('Location: /users/image/' . $data['id']);
+            }catch (\Exception $e) {
+                return json_encode([
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 
     /**

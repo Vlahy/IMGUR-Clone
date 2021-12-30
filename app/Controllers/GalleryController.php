@@ -37,11 +37,11 @@ class GalleryController extends BaseController
         }
 
         $offset = $this->pagination->offset();
-        $limit = $this->pagination->limit();
+        $limit = $this->pagination->limit(10);
 
         $data = $this->galleryModel->listGalleries($id, $limit, $offset, $hide);
 
-        $this->view('UserProfileView', $data);
+        $this->view('UserListGalleryView', $data);
     }
 
     /**
@@ -55,7 +55,8 @@ class GalleryController extends BaseController
         $offset = $this->pagination->offset();
         $limit = $this->pagination->limit();
 
-        $data = $this->galleryModel->getOneGallery($id, $limit, $offset);
+        $data['gallery'] = $this->galleryModel->getOneGallery($id, $limit, $offset);
+        $data['info'] = $this->galleryModel->getGalleryInfo($id);
 
         $this->view('GalleryView', $data);
 
@@ -66,9 +67,40 @@ class GalleryController extends BaseController
         // TODO: Implement store() method.
     }
 
+    /**
+     * Method for updating gallery info
+     *
+     * @return false|string|void
+     */
     public function update()
     {
-        // TODO: Implement update() method.
+        $data = [
+            'id' => '',
+            'name' => '',
+            'description' => ''
+        ];
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+            $data = [
+                'id' => trim($_POST['id']),
+                'name' => trim($_POST['name']),
+                'description' => trim($_POST['description']),
+            ];
+
+            try {
+
+                $this->galleryModel->updateGalleryInfo($data);
+                header('Location: /users/gallery/' . $_POST['id']);
+
+            }catch (\Exception $e) {
+                return json_encode([
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 
     /**
