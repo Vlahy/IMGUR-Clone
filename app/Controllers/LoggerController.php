@@ -8,15 +8,18 @@ class LoggerController extends BaseController
 {
 
     private LoggerModel $loggerModel;
+    private Pagination $pagination;
+    private string $table = 'logger';
 
     public function __construct()
     {
         $this->loggerModel = new LoggerModel();
+        $this->pagination = new Pagination($this->table);
     }
 
     public function setImageAsHidden($userId, $imageId)
     {
-        $comment = "Set image as hidden!";
+        $comment = "set image as hidden!";
 
         try {
             $this->loggerModel->setImage($userId, $imageId, $comment);
@@ -31,7 +34,7 @@ class LoggerController extends BaseController
 
     public function setImageAsNsfw($userId, $imageId)
     {
-        $comment = "Set image as nsfw!";
+        $comment = "set image as nsfw!";
 
         try {
             $this->loggerModel->setImage($userId, $imageId, $comment);
@@ -46,7 +49,7 @@ class LoggerController extends BaseController
 
     public function setGalleryAsHidden($userId, $galleryId)
     {
-        $comment = "Set gallery as hidden!";
+        $comment = "set gallery as hidden!";
 
         try {
             $this->loggerModel->setGallery($userId, $galleryId, $comment);
@@ -61,7 +64,7 @@ class LoggerController extends BaseController
 
     public function setGalleryAsNsfw($userId, $galleryId)
     {
-        $comment = "Set gallery as nsfw!";
+        $comment = "set gallery as nsfw!";
 
         try {
             $this->loggerModel->setGallery($userId, $galleryId, $comment);
@@ -72,6 +75,21 @@ class LoggerController extends BaseController
             ]);
         }
 
+    }
+
+    public function getData()
+    {
+
+        $limit = $this->pagination->limit();
+        $offset = $this->pagination->offset();
+
+        try {
+            return $this->loggerModel->listData($limit, $offset);
+        } catch (\Exception $e) {
+            return json_encode([
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
 }

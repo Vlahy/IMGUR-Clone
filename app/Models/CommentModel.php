@@ -19,7 +19,7 @@ class CommentModel
     {
         $db = $this->conn->getConnection();
 
-        $stmt = $db->prepare("SELECT c.comment, u.username FROM comment c JOIN user u ON u.id = c.user_id WHERE gallery_id = :id");
+        $stmt = $db->prepare("SELECT c.comment, u.username FROM comment c JOIN user u ON u.id = c.user_id WHERE gallery_id = :id ORDER BY c.id DESC");
 
         $stmt->bindValue(':id', $id);
 
@@ -34,7 +34,7 @@ class CommentModel
     {
         $db = $this->conn->getConnection();
 
-        $stmt = $db->prepare("SELECT c.comment, u.username FROM comment c JOIN user u on u.id = c.user_id WHERE image_id = :id");
+        $stmt = $db->prepare("SELECT c.comment, u.username FROM comment c JOIN user u on u.id = c.user_id WHERE image_id = :id ORDER BY c.id DESC");
 
         $stmt->bindValue(':id', $id);
 

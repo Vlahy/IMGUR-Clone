@@ -146,4 +146,27 @@ class UserModel implements Role
 
     }
 
+    /**
+     * Method for changing role of user
+     *
+     * @param $data
+     * @return bool
+     */
+    public function changeRole($data): bool
+    {
+        $db = $this->conn->getConnection();
+
+        $stmt = $db->prepare("UPDATE user SET role = :role WHERE id = :id");
+
+        $stmt->bindValue(':role', $data['role']);
+        $stmt->bindValue(':id', $data['user_id']);
+
+        if ($stmt->execute()){
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
 }

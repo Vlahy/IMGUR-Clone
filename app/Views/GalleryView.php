@@ -23,7 +23,7 @@ if (isset($data) && $data != false && $data['info'] != null) {
     if (isset($_SESSION['user_id'])) {
         if ($_SESSION['user_id'] == $info['user_id']) {
             echo '<form class="d-inline" action="http://localhost/users/gallery/delete/' . $info["id"] . '" method="post">
-            <button type="submit" class="btn btn-danger">Delete</button></form>';
+            <button type="submit" class="btn btn-outline-danger">Delete</button></form>';
         }
         if ($_SESSION['user_id'] == $info['user_id'] || $_SESSION['role'] == 'admin') {
             echo '<button type="button" class="btn btn-outline-primary m-2" data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</button>';

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Config\Database;
+use PDO;
 
 class LoggerModel
 {
@@ -47,6 +48,23 @@ class LoggerModel
         } else {
             return false;
         }
+    }
+
+    public function listData($limit, $offset)
+    {
+        $db = $this->conn->getConnection();
+
+        $stmt = $db->prepare("SELECT u.username, l.comment, g.name, i.id as image_id, g.id as gallery_id, l.date FROM logger l JOIN user u on l.user_id = u.id LEFT JOIN image i on l.image_id = i.id LEFT JOIN gallery g on l.gallery_id = g.id LIMIT :limit OFFSET :offset");
+
+        $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+
+        if ($stmt->execute()) {
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            return false;
+        }
+
     }
 
 }

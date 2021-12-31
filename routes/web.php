@@ -30,15 +30,6 @@ $router->match('GET|POST', '/users/login', 'App\Controllers\AuthController@login
 
 $router->get('/users/logout', 'App\Controllers\AuthController@logout');
 
-$router->get('/dashboard', function () {
-    require_once '../config/config.php';
-    require_once HEADER;
-    require_once NAVIGATION;
-    if (isset($_SESSION['user_id'])){
-        echo json_encode($_SESSION);
-    }
-});
-
 $router->get('/users/profile/{id}', 'App\Controllers\GalleryController@index');
 
 $router->get('/users/gallery/{id}', 'App\Controllers\GalleryController@show');
@@ -65,6 +56,15 @@ $router->post('/users/gallery/comment', 'App\Controllers\CommentController@store
 
 $router->post('/users/image/comment', 'App\Controllers\CommentController@storeImageComment');
 
-//$router->get('/user');
+$router->before('GET|POST','/admin/.*', function () {
+    if (!isset($_SESSION['user']) && $_SESSION['role'] != 'admin') {
+        header('Location: /');
+        exit();
+    }
+});
+
+$router->get('/admin/panel', 'App\Controllers\AdminController@listLoggerData');
+
+$router->post('/admin/changeRole', 'App\Controllers\AdminController@changeRole');
 
 $router->run();
