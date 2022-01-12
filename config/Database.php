@@ -7,34 +7,57 @@ require 'config.php';
 use PDO;
 use PDOException;
 
-class Database
+final class Database
 {
+
+    private static ?Database $instance = null;
+    private static PDO $conn;
+
     private string $db_host = DB_HOST;
     private string $db_name = DB_NAME;
     private string $db_user = DB_USER;
     private string $db_pass = DB_PASS;
 
+    public static function getInstance(): Database
+    {
+        if (is_null(self::$instance)) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+    private function __construct() {}
+
+    private function __clone() {}
+
+    private function __wakeup() {}
+
     /**
      * Database connection
      *
-     * @return false|PDO|string
+     * @return false|string|void
      */
-    public function getConnection()
+    public static function connection()
     {
-
-        $dsn = "mysql:host=" . $this->db_host . ";dbname=" . $this->db_name;
+        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME;
 
         try {
-            $conn = new PDO($dsn, $this->db_user, $this->db_pass);
-            $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            self::$conn = new PDO($dsn, DB_USER, DB_PASS);
+            self::$conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            self::$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         }catch (PDOException $e){
             return json_encode([
                 'error' => $e->getMessage(),
             ]);
         }
 
-        return $conn;
+    }
+
+    public static function getConnection(): PDO
+    {
+        return self::$conn;
     }
 
 }

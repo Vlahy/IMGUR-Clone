@@ -1,28 +1,20 @@
 <?php
 
 use Bramus\Router\Router;
+use Config\Database;
 
+Database::connection();
 $router = new Router();
 
 $router->setBasePath('/');
 
 // Custom 404 Handler
 $router->set404(function () {
-    header('HTTP/1.1 404 Not Found');
-    header('Content-Type: application/json');
+    include NOT_FOUND;
 
-    $jsonArray = array();
-    $jsonArray['status'] = "404";
-    $jsonArray['status_text'] = "Route not defined";
-
-    echo json_encode($jsonArray);
 });
 
-
-$router->get('/', function () {
-    require_once '../config/config.php';
-    require_once '../app/Views/WelcomeView.php';
-});
+$router->get('/', 'App\Controllers\ImageController@listAllImages');
 
 $router->match('GET|POST','/users/register', 'App\Controllers\AuthController@register');
 

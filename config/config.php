@@ -16,3 +16,5 @@ const HOME_URL = 'http://localhost/';
 define('HEADER', $_SERVER['DOCUMENT_ROOT'] . '/../app/Helpers/header.php');
 define('NAVIGATION', $_SERVER['DOCUMENT_ROOT'] . '/../app/Helpers/navigation.php');
 define('FOOTER', $_SERVER['DOCUMENT_ROOT'] . '/../app/Helpers/footer.php');
+define('PAGE_NAVIGATION', $_SERVER['DOCUMENT_ROOT'] . '/../app/Helpers/pageNavigation.php');
+define('NOT_FOUND', $_SERVER['DOCUMENT_ROOT'] . '/../app/Views/404.php');

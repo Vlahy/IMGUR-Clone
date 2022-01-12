@@ -12,6 +12,8 @@ class ImageController extends BaseController
     private LoggerController $logger;
     private UserModel $userModel;
     private CommentController $comment;
+    private string $table = 'image';
+    private Pagination $pagination;
 
     public function __construct()
     {
@@ -19,6 +21,7 @@ class ImageController extends BaseController
         $this->logger = new LoggerController();
         $this->userModel = new UserModel();
         $this->comment = new CommentController();
+        $this->pagination = new Pagination($this->table);
     }
 
     /**
@@ -33,17 +36,40 @@ class ImageController extends BaseController
         $data = [];
 
         $user = $_SESSION['user_id'] ?? null;
-        if ($this->userModel->isAuthor($user)){
+        if ($this->userModel->isAuthor($user)) {
             $hide = false;
-        }else{
+        } else {
             $hide = true;
         }
 
         $data['image'] = $this->imageModel->getImage($id, $hide);
         $data['comment'] = $this->comment->getImageComment($id);
 
+        if (empty($data['image'])){
+            header('Location: /404');
+        }
+
         $this->view('ImageView', $data);
 
+    }
+
+    /**
+     * Method for listing all images to not logged user
+     *
+     * @return void
+     */
+    public function listAllImages()
+    {
+        $limit = $this->pagination->limit();
+        $offset = $this->pagination->offset();
+
+        $data = $this->imageModel->getAllImages($limit, $offset);
+
+        if (empty($data)){
+            header('Location: /404');
+        }
+
+        $this->view('IndexView', $data);
     }
 
     public function store()
@@ -63,7 +89,7 @@ class ImageController extends BaseController
             'slug' => '',
         ];
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
@@ -75,7 +101,7 @@ class ImageController extends BaseController
             try {
                 $this->imageModel->updateImage($data);
                 header('Location: /users/image/' . $data['id']);
-            }catch (\Exception $e) {
+            } catch (\Exception $e) {
                 return json_encode([
                     'error' => $e->getMessage(),
                 ]);
