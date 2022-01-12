@@ -15,14 +15,15 @@ class Pagination
     public function __construct($table)
     {
         $this->table = $table;
-        $this->conn = new Database();
+        $this->conn = Database::getInstance();
         $this->setTotalRecords();
     }
 
     public function setTotalRecords()
     {
         $db = $this->conn->getConnection();
-        $stmt = $db->prepare("SELECT id FROM $this->table");
+        $query = "SELECT COUNT(id) FROM $this->table";
+        $stmt = $db->prepare($query);
         $stmt->execute();
         $this->totalRecords = $stmt->rowCount();
     }

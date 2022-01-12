@@ -39,7 +39,7 @@ class GalleryController extends BaseController
         }
 
         $offset = $this->pagination->offset();
-        $limit = $this->pagination->limit(10);
+        $limit = $this->pagination->limit();
 
         $data = $this->galleryModel->listGalleries($id, $limit, $offset, $hide);
 
@@ -54,12 +54,23 @@ class GalleryController extends BaseController
      */
     public function show($id)
     {
+
         $offset = $this->pagination->offset();
         $limit = $this->pagination->limit();
 
         $data['gallery'] = $this->galleryModel->getOneGallery($id, $limit, $offset);
         $data['info'] = $this->galleryModel->getGalleryInfo($id);
         $data['comment'] = $this->comment->getGalleryComment($id);
+
+        if (empty($data['gallery'])){
+            header('Location: /404');
+        }
+
+        if ($this->userModel->isAuthor($data['info'][0]['user_id']) === false && !$this->userModel->isAdmin()) {
+            if ($data['info'][0]['hidden'] == 1 || $data['info'][0]['nsfw'] == 1) {
+                header('Location: /404');
+            }
+        }
 
         $this->view('GalleryView', $data);
 

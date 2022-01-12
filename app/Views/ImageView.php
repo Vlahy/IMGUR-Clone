@@ -2,7 +2,7 @@
 
 include HEADER;
 include NAVIGATION;
-if (isset($data) && $data != null && $data['image'] != false && $data['comment'] != false) {
+if (isset($data) && $data != null && $data['image'] != false) {
     $image = $data['image'];
     echo '<div class="container">';
     echo '<div class="row">';

@@ -4,56 +4,81 @@ namespace App\Models;
 
 use Config\Database;
 use PDO;
+use Predis\Client;
+use App\Models\Enums\RedisConfig;
 
-class GalleryModel
+class GalleryModel implements RedisConfig
 {
+
 
     private Database $conn;
 
     public function __construct()
     {
-        $this->conn = new Database();
+        $this->conn = Database::getInstance();
     }
 
     public function listGalleries($id, $limit, $offset, $hide)
     {
-        $db = $this->conn->getConnection();
+        $page = $_GET['page'] ?? 1;
 
-        if ($hide === true) {
-            $query = "select * from gallery where user_id = :user_id and nsfw = 0 and hidden = 0 limit :limit offset :offset";
+        $redis = new Client();
+
+        if (!$redis->get(RedisConfig::ALL_GALLERIES . $id . 'PAGE' . $page)) {
+            $db = $this->conn->getConnection();
+
+            if ($hide === true) {
+                $query = "select * from gallery where user_id = :user_id and nsfw = 0 and hidden = 0 limit :limit offset :offset";
+            } else {
+                $query = "select * from gallery where user_id = :user_id limit :limit offset :offset";
+            }
+
+            $stmt = $db->prepare($query);
+
+            $stmt->bindValue(':user_id', $id);
+            $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+
+            if ($stmt->execute()) {
+                $data = $stmt->fetchAll(PDO::FETCH_OBJ);
+                $redis->set(RedisConfig::ALL_GALLERIES . $id . 'PAGE' . $page, serialize($data));
+                $redis->expire(RedisConfig::ALL_GALLERIES . $id . 'PAGE' . $page, 600);
+                return $data;
+            } else {
+                return false;
+            }
         } else {
-            $query = "select * from gallery where user_id = :user_id limit :limit offset :offset";
-        }
-
-        $stmt = $db->prepare($query);
-
-        $stmt->bindValue(':user_id', $id);
-        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
-
-        if ($stmt->execute()) {
-            return $stmt->fetchAll(PDO::FETCH_OBJ);
-        } else {
-            return false;
+            return unserialize($redis->get(RedisConfig::ALL_GALLERIES . $id . 'PAGE' . $page));
         }
     }
 
-    public function getOneGallery($galleryID, $limit, $offset)
+    public function getOneGallery(int $galleryID, int $limit, int $offset)
     {
-        $db = $this->conn->getConnection();
+        $redis = new Client();
 
-        $query = "select * from image where id in (select image_id from image_gallery where gallery_id = :galleryID) limit :limit offset :offset";
+        $page = $_GET['page'] ?? 1;
 
-        $stmt = $db->prepare($query);
+        if (!$redis->get(RedisConfig::ONE_GALLERY . $galleryID . 'PAGE' . $page)) {
+            $db = $this->conn->getConnection();
 
-        $stmt->bindValue(':galleryID', $galleryID);
-        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+            $query = "select * from image where id in (select image_id from image_gallery where gallery_id = :galleryID) limit :limit offset :offset";
 
-        if ($stmt->execute()) {
-            return $stmt->fetchAll(PDO::FETCH_OBJ);
+            $stmt = $db->prepare($query);
+
+            $stmt->bindValue(':galleryID', $galleryID . 'PAGE' . $page);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+            if ($stmt->execute()) {
+                $data = $stmt->fetchAll(PDO::FETCH_OBJ);
+                $redis->set(RedisConfig::ONE_GALLERY . $galleryID . 'PAGE' . $page, serialize($data));
+                $redis->expire(RedisConfig::ONE_GALLERY . $galleryID . 'PAGE' . $page, 600);
+                return $data;
+            } else {
+                return false;
+            }
         } else {
-            return false;
+            return unserialize($redis->get(RedisConfig::ONE_GALLERY . $galleryID . 'PAGE' . $page));
         }
     }
 
@@ -76,6 +101,12 @@ class GalleryModel
 
     public function deleteGallery($id): bool
     {
+        $redis = new Client();
+
+        if ($redis->get(RedisConfig::ONE_GALLERY . $id)) {
+            $redis->del(RedisConfig::ONE_GALLERY . $id);
+        }
+
         $db = $this->conn->getConnection();
 
         $query = "DELETE FROM gallery WHERE id = :id";
@@ -94,6 +125,11 @@ class GalleryModel
 
     public function updateGalleryInfo($data): bool
     {
+        $redis = new Client();
+
+        if ($redis->get(RedisConfig::ONE_GALLERY . $data['id'])) {
+            $redis->del(RedisConfig::ONE_GALLERY . $data['id']);
+        }
 
         $db = $this->conn->getConnection();
 
@@ -113,6 +149,12 @@ class GalleryModel
 
     public function setAsNsfw($id): bool
     {
+        $redis = new Client();
+
+        if ($redis->get(RedisConfig::ONE_GALLERY . $id)) {
+            $redis->del(RedisConfig::ONE_GALLERY . $id);
+        }
+
         $db = $this->conn->getConnection();
 
         $stmt = $db->prepare("UPDATE gallery SET nsfw = 1 WHERE id = :id");
@@ -128,6 +170,12 @@ class GalleryModel
 
     public function setAsHidden($id): bool
     {
+        $redis = new Client();
+
+        if ($redis->get(RedisConfig::ONE_GALLERY . $id)) {
+            $redis->del(RedisConfig::ONE_GALLERY . $id);
+        }
+
         $db = $this->conn->getConnection();
 
         $stmt = $db->prepare("UPDATE gallery SET hidden = 1 WHERE id = :id");

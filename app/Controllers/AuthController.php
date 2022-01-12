@@ -3,8 +3,10 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
+use Predis\Client;
+use App\Models\Enums\RedisConfig;
 
-class AuthController extends BaseController
+class AuthController extends BaseController implements RedisConfig
 {
 
     private UserModel $userModel;
@@ -203,6 +205,11 @@ class AuthController extends BaseController
      */
     public function logout()
     {
+        $redis = new Client();
+        $redis->connect(RedisConfig::REDIS_HOST,RedisConfig::REDIS_PORT);
+
+        $redis->flushall();
+
         unset($_SESSION['user_id']);
         unset($_SESSION['username']);
         unset($_SESSION['email']);

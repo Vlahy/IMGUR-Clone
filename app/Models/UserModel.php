@@ -12,16 +12,16 @@ class UserModel implements Role
 
     public function __construct()
     {
-        $this->conn = new Database();
+        $this->conn = Database::getInstance();
     }
 
     /**
      * Method for registering users
      *
-     * @param $data
+     * @param array $data
      * @return bool
      */
-    public function register($data): bool
+    public function register(array $data): bool
     {
         $db = $this->conn->getConnection();
         $query = "INSERT INTO user (username, email, password, api_key, role) VALUES(:username, :email, :password, :api_key, :role)";
@@ -62,10 +62,10 @@ class UserModel implements Role
     /**
      * Method for finding user by email
      *
-     * @param $email
+     * @param string $email
      * @return bool
      */
-    public function findUserByEmail($email): bool
+    public function findUserByEmail(string $email): bool
     {
         $db = $this->conn->getConnection();
         $query = "SELECT * FROM user WHERE email = :email";
@@ -115,16 +115,11 @@ class UserModel implements Role
     /**
      * Method for checking if user is logged in
      *
-     * @param $id
      * @return bool
      */
-    public function isLoggedIn($id): bool
+    public function isLoggedIn(): bool
     {
-        if (isset($_SESSION['user_id'])) {
-            return true;
-        }
-        return false;
-
+        return isset($_SESSION['user_id']);
     }
 
     /**
@@ -135,8 +130,8 @@ class UserModel implements Role
      */
     public function isAuthor($id): bool
     {
-        if ($this->isLoggedIn($id)) {
-            if ($_SESSION['user_id'] === $id) {
+        if ($this->isLoggedIn()) {
+            if ($_SESSION['user_id'] === $id && $id != null) {
                 return true;
             } else {
                 return false;
@@ -147,12 +142,29 @@ class UserModel implements Role
     }
 
     /**
-     * Method for changing role of user
+     * Method for checking if user is admin
      *
-     * @param $data
      * @return bool
      */
-    public function changeRole($data): bool
+    public function isAdmin(): bool
+    {
+        if ($this->isLoggedIn()) {
+            if ($_SESSION['role'] === 'admin') {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Method for changing role of user
+     *
+     * @param array $data
+     * @return bool
+     */
+    public function changeRole(array $data): bool
     {
         $db = $this->conn->getConnection();
 
@@ -161,7 +173,7 @@ class UserModel implements Role
         $stmt->bindValue(':role', $data['role']);
         $stmt->bindValue(':id', $data['user_id']);
 
-        if ($stmt->execute()){
+        if ($stmt->execute()) {
             return true;
         } else {
             return false;
