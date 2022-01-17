@@ -21,7 +21,6 @@ class ImageModel implements RedisConfig
     {
 
         $redis = new Client();
-        $redis->connect(RedisConfig::REDIS_HOST,RedisConfig::REDIS_PORT);
 
         if (!$redis->get(RedisConfig::ONE_IMAGE . $id)) {
 
@@ -81,10 +80,30 @@ class ImageModel implements RedisConfig
         }
     }
 
+    public function storeImage(array $data): bool
+    {
+        $db = $this->conn->getConnection();
+
+        $query = "INSERT INTO image (user_id, file_name, slug, nsfw, hidden) VALUES (:user_id, :file_name, :slug, :nsfw, :hidden)";
+
+        $stmt = $db->prepare($query);
+
+        $stmt->bindValue(':user_id', $data['user_id']);
+        $stmt->bindValue(':file_name', $data['file_name']);
+        $stmt->bindValue(':slug', $data['slug']);
+        $stmt->bindValue(':nsfw', 0);
+        $stmt->bindValue(':hidden', 0);
+
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function deleteImage($id): bool
     {
         $redis = new Client();
-        $redis->connect(RedisConfig::REDIS_HOST,RedisConfig::REDIS_PORT);
 
         if ($redis->get(RedisConfig::ONE_IMAGE . $id)) {
             $redis->del(RedisConfig::ONE_IMAGE . $id);
@@ -106,7 +125,6 @@ class ImageModel implements RedisConfig
     public function updateImage($data): bool
     {
         $redis = new Client();
-        $redis->connect(RedisConfig::REDIS_HOST,RedisConfig::REDIS_PORT);
 
         if ($redis->get(RedisConfig::ONE_IMAGE . $data['id'])) {
             $redis->del(RedisConfig::ONE_IMAGE . $data['id']);
@@ -129,7 +147,6 @@ class ImageModel implements RedisConfig
     public function setAsNsfw($id): bool
     {
         $redis = new Client();
-        $redis->connect(RedisConfig::REDIS_HOST,RedisConfig::REDIS_PORT);
 
         if ($redis->get(RedisConfig::ONE_IMAGE . $id)) {
             $redis->del(RedisConfig::ONE_IMAGE . $id);
@@ -151,7 +168,6 @@ class ImageModel implements RedisConfig
     public function setAsHidden($id): bool
     {
         $redis = new Client();
-        $redis->connect(RedisConfig::REDIS_HOST,RedisConfig::REDIS_PORT);
 
         if ($redis->get(RedisConfig::ONE_IMAGE . $id)) {
             $redis->del(RedisConfig::ONE_IMAGE . $id);

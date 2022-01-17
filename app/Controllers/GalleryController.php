@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\GalleryModel;
 use App\Models\UserModel;
+use App\Helpers\Slugify;
 
 class GalleryController extends BaseController
 {
@@ -15,13 +16,13 @@ class GalleryController extends BaseController
     private UserModel $userModel;
     private CommentController $comment;
 
-    public function __construct()
+    public function __construct(GalleryModel $galleryModel, LoggerController $loggerController, UserModel $userModel, CommentController $commentController)
     {
-        $this->galleryModel = new GalleryModel();
+        $this->galleryModel = $galleryModel;
         $this->pagination = new Pagination($this->table);
-        $this->logger = new LoggerController();
-        $this->userModel = new UserModel();
-        $this->comment = new CommentController();
+        $this->logger = $loggerController;
+        $this->userModel = $userModel;
+        $this->comment = $commentController;
     }
 
     /**
@@ -49,7 +50,7 @@ class GalleryController extends BaseController
     /**
      * Method for showing one gallery
      *
-     * @param $id
+     * @param $slug
      * @return void
      */
     public function show($id)
@@ -62,7 +63,7 @@ class GalleryController extends BaseController
         $data['info'] = $this->galleryModel->getGalleryInfo($id);
         $data['comment'] = $this->comment->getGalleryComment($id);
 
-        if (empty($data['gallery'])){
+        if (empty($data['info'])) {
             header('Location: /404');
         }
 
@@ -76,9 +77,35 @@ class GalleryController extends BaseController
 
     }
 
+    /**
+     * Method for creating gallery
+     *
+     * @return false|string|void
+     */
     public function store()
     {
-        // TODO: Implement store() method.
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+            $data = [
+                'user_id' => trim($_POST['user_id']),
+                'name' => trim($_POST['name']),
+                'description' => trim($_POST['description']),
+                'slug' => Slugify::slugify($_POST['name']),
+            ];
+
+            try {
+                $this->galleryModel->storeGallery($data);
+                header('Location: /users/profile/' . $_SESSION['user_id']);
+
+            } catch (\Exception $e) {
+                return json_encode([
+                    'error' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                ]);
+            }
+        }
     }
 
     /**
@@ -94,7 +121,7 @@ class GalleryController extends BaseController
             'description' => ''
         ];
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
@@ -109,7 +136,7 @@ class GalleryController extends BaseController
                 $this->galleryModel->updateGalleryInfo($data);
                 header('Location: /users/gallery/' . $_POST['id']);
 
-            }catch (\Exception $e) {
+            } catch (\Exception $e) {
                 return json_encode([
                     'error' => $e->getMessage(),
                 ]);

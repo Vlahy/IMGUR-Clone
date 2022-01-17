@@ -1,9 +1,15 @@
 <?php
 
+use App\Controllers\GalleryController;
+use App\Controllers\ImageController;
 use Bramus\Router\Router;
 use Config\Database;
+use DI\Container;
 
 Database::connection();
+
+$container = new Container();
+
 $router = new Router();
 
 $router->setBasePath('/');
@@ -11,10 +17,11 @@ $router->setBasePath('/');
 // Custom 404 Handler
 $router->set404(function () {
     include NOT_FOUND;
-
 });
 
-$router->get('/', 'App\Controllers\ImageController@listAllImages');
+$router->get('/', function () use ($container) {
+    $container->get(ImageController::class)->listAllImages();
+});
 
 $router->match('GET|POST','/users/register', 'App\Controllers\AuthController@register');
 
@@ -22,27 +29,57 @@ $router->match('GET|POST', '/users/login', 'App\Controllers\AuthController@login
 
 $router->get('/users/logout', 'App\Controllers\AuthController@logout');
 
-$router->get('/users/profile/{id}', 'App\Controllers\GalleryController@index');
+$router->get('/users/profile/{id}', function ($id) use ($container) {
+    $container->get(GalleryController::class)->index($id);
+});
 
-$router->get('/users/gallery/{id}', 'App\Controllers\GalleryController@show');
+$router->get('/users/gallery/{id}', function ($id) use ($container) {
+    $container->get(GalleryController::class)->show($id);
+});
 
-$router->get('/users/image/{id}', 'App\Controllers\ImageController@show');
+$router->get('/users/image/{id}', function ($id) use ($container) {
+    $container->get(ImageController::class)->show($id);
+});
 
-$router->post('/users/image/delete/{id}', 'App\Controllers\ImageController@delete');
+$router->post('/users/image/delete/{id}', function ($id) use ($container) {
+    $container->get(ImageController::class)->delete($id);
+});
 
-$router->post('/users/image/nsfw/{id}', 'App\Controllers\ImageController@setImageAsNsfw');
+$router->post('/users/image/nsfw/{id}', function ($id) use ($container) {
+    $container->get(ImageController::class)->setImageAsNsfw($id);
+});
 
-$router->post('/users/image/hidden/{id}', 'App\Controllers\ImageController@setImageAsHidden');
+$router->post('/users/image/hidden/{id}', function ($id) use ($container) {
+    $container->get(ImageController::class)->setImageAsHidden($id);
+});
 
-$router->post('/users/gallery/delete/{id}', 'App\Controllers\GalleryController@delete');
+$router->post('/users/gallery/add' , function () use ($container) {
+    $container->get(GalleryController::class)->store();
+});
 
-$router->post('/users/gallery/nsfw/{id}', 'App\Controllers\GalleryController@setGalleryAsNsfw');
+$router->post('/users/image/add', function () use ($container) {
+    $container->get(ImageController::class)->store();
+});
 
-$router->post('/users/gallery/hidden/{id}', 'App\Controllers\GalleryController@setGalleryAsHidden');
+$router->get('/users/gallery/delete/{id}', function ($id) use ($container) {
+    $container->get(GalleryController::class)->delete($id);
+});
 
-$router->post('/users/gallery/update', 'App\Controllers\GalleryController@update');
+$router->get('/users/gallery/nsfw/{id}', function ($id) use ($container) {
+    $container->get(GalleryController::class)->setGalleryAsNsfw($id);
+});
 
-$router->post('/users/image/update', 'App\Controllers\ImageController@update');
+$router->get('/users/gallery/hidden/{id}', function ($id) use ($container) {
+    $container->get(GalleryController::class)->setGalleryAsHidden($id);
+});
+
+$router->get('/users/gallery/update', function () use ($container) {
+    $container->get(GalleryController::class)->update();
+});
+
+$router->post('/users/image/update', function () use ($container) {
+    $container->get(ImageController::class)->update();
+});
 
 $router->post('/users/gallery/comment', 'App\Controllers\CommentController@storeGalleryComment');
 
