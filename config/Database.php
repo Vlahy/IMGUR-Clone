@@ -4,6 +4,7 @@ namespace Config;
 
 require 'config.php';
 
+use Exception;
 use PDO;
 use PDOException;
 
@@ -29,9 +30,19 @@ final class Database
 
     private function __construct() {}
 
-    private function __clone() {}
+    /**
+     * @throws Exception
+     */
+    private function __clone() {
+        throw new Exception('Cloning is not allowed');
+    }
 
-    private function __wakeup() {}
+    /**
+     * @throws Exception
+     */
+    private function __wakeup() {
+        throw new Exception('Deserialization is not allowed');
+    }
 
     /**
      * Database connection

@@ -3,9 +3,6 @@
 include HEADER;
 include NAVIGATION;
 
-if (isset($_SESSION['user_id'])) {
-    header('Location: /users/profile/' . $_SESSION['user_id']);
-}
 
 if (isset($data)) {
 

@@ -2,27 +2,30 @@
 
 namespace App\Controllers;
 
+use App\Helpers\Slugify;
+use App\Models\CommentModel;
 use App\Models\ImageModel;
 use App\Models\UserModel;
 
 class ImageController extends BaseController
 {
 
-    private ImageModel $imageModel;
     private LoggerController $logger;
     private UserModel $userModel;
-    private CommentController $comment;
     private string $table = 'image';
     private Pagination $pagination;
+    private CommentController $commentController;
+    private ImageModel $imageModel;
 
-    public function __construct()
+    public function __construct(ImageModel $imageModel, CommentController $commentController, LoggerController $loggerController, UserModel $userModel)
     {
-        $this->imageModel = new ImageModel();
-        $this->logger = new LoggerController();
-        $this->userModel = new UserModel();
-        $this->comment = new CommentController();
+        $this->imageModel = $imageModel;
+        $this->commentController = $commentController;
+        $this->logger = $loggerController;
+        $this->userModel = $userModel;
         $this->pagination = new Pagination($this->table);
     }
+
 
     /**
      * Method for showing one image
@@ -43,7 +46,7 @@ class ImageController extends BaseController
         }
 
         $data['image'] = $this->imageModel->getImage($id, $hide);
-        $data['comment'] = $this->comment->getImageComment($id);
+        $data['comment'] = $this->commentController->getImageComment($id);
 
         if (empty($data['image'])){
             header('Location: /404');
@@ -72,9 +75,56 @@ class ImageController extends BaseController
         $this->view('IndexView', $data);
     }
 
+    /**
+     * Method for storing images
+     *
+     * @return bool
+     */
     public function store()
     {
-        // TODO: Implement store() method.
+
+        // Could not finish this task on time, will finish today. Date 17.01.2022. 10:30
+        $data = [];
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            if (isset($_FILES['image']) && $_FILES['image']['error'] == UPLOAD_ERR_OK){
+
+                $info = getimagesize($_FILES['image']['tmp_name']);
+                $allowedTypes = [
+                    IMAGETYPE_JPEG => '.jpg',
+                    IMAGETYPE_PNG => '.png',
+                ];
+
+                if ($info === false) {
+                    die();
+                }else if (!array_key_exists($info[2], $allowedTypes)) {
+                    die();
+                }else {
+                    $path = $_SERVER['DOCUMENT_ROOT'] . '/../public/images/';
+                    $fileName = Slugify::slugify($_FILES['image']['name']) . $allowedTypes['info'][2];
+                    move_uploaded_file($_FILES['image']['tmp_name'], $path . $fileName);
+
+                    $data = [
+                        'user_id' => $_POST['user_id'],
+                        'file_name' => $fileName,
+                        'slug' => Slugify::slugify($_FILES['image']['name']),
+                    ];
+
+                    try {
+                        $this->imageModel->storeImage($data);
+
+                        header('Location: /');
+                    } catch (\Exception $e) {
+                        return json_encode([
+                            'error' => $e->getMessage(),
+                            'code' => $e->getCode(),
+                        ]);
+                    }
+
+                }
+            }
+        }
     }
 
     /**
