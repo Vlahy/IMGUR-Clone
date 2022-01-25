@@ -80,7 +80,7 @@ class ImageController extends BaseController
      *
      * @return bool
      */
-    public function store()
+    public function store(): bool
     {
 
         // Could not finish this task on time, will finish today. Date 17.01.2022. 10:30
@@ -92,8 +92,9 @@ class ImageController extends BaseController
 
                 $info = getimagesize($_FILES['image']['tmp_name']);
                 $allowedTypes = [
-                    IMAGETYPE_JPEG => '.jpg',
-                    IMAGETYPE_PNG => '.png',
+                    IMAGETYPE_JPEG => 'image/jpeg',
+                    IMAGETYPE_PNG => 'image/png',
+                    IMAGETYPE_GIF => 'image/gif',
                 ];
 
                 if ($info === false) {
@@ -101,27 +102,33 @@ class ImageController extends BaseController
                 }else if (!array_key_exists($info[2], $allowedTypes)) {
                     die();
                 }else {
-                    $path = $_SERVER['DOCUMENT_ROOT'] . '/../public/images/';
-                    $fileName = Slugify::slugify($_FILES['image']['name']) . $allowedTypes['info'][2];
-                    move_uploaded_file($_FILES['image']['tmp_name'], $path . $fileName);
+                    $path = $_SERVER['DOCUMENT_ROOT'] . '/images/';
+                    $fileName = date('Y-m-d H:i:s') . $_FILES['image']['name'];
+                    if(move_uploaded_file($_FILES['image']['tmp_name'], $path . $fileName)) {
 
-                    $data = [
-                        'user_id' => $_POST['user_id'],
-                        'file_name' => $fileName,
-                        'slug' => Slugify::slugify($_FILES['image']['name']),
-                    ];
+                        $data = [
+                            'user_id' => trim($_POST['user_id']),
+                            'gallery_id' => trim($_POST['gallery_id']),
+                            'file_name' => $fileName,
+                            'slug' => Slugify::slugify(pathinfo($fileName, PATHINFO_FILENAME)),
+                        ];
 
-                    try {
-                        $this->imageModel->storeImage($data);
+                        try {
+                            $this->imageModel->storeImage($data);
 
-                        header('Location: /');
-                    } catch (\Exception $e) {
-                        return json_encode([
-                            'error' => $e->getMessage(),
-                            'code' => $e->getCode(),
-                        ]);
+                            $this->imageModel->storeImageInGallery($data);
+
+                            header('Location: /users/gallery/' . $data['gallery_id']);
+                        } catch (\Exception $e) {
+                            header('Location: /');
+                            return json_encode([
+                                'error' => $e->getMessage(),
+                                'code' => $e->getCode(),
+                            ]);
+                        }
+                    } else {
+                        header('Location: /users/profile/3');
                     }
-
                 }
             }
         }

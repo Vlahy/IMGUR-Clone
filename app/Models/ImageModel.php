@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Enums\RedisConfig;
 use Config\Database;
 use PDO;
 use Predis\Client;
-use App\Models\Enums\RedisConfig;
 
 class ImageModel implements RedisConfig
 {
@@ -17,35 +17,35 @@ class ImageModel implements RedisConfig
         $this->conn = Database::getInstance();
     }
 
-    public function getImage($id, $hide)
+    public function getImage($slug, $hide)
     {
 
         $redis = new Client();
 
-        if (!$redis->get(RedisConfig::ONE_IMAGE . $id)) {
+        if (!$redis->get(RedisConfig::ONE_IMAGE . $slug)) {
 
             $db = $this->conn->getConnection();
 
             if ($hide == true) {
-                $query = "SELECT * FROM image WHERE id = :id AND nsfw = 0 and hidden = 0";
+                $query = "SELECT * FROM image WHERE slug = :slug AND nsfw = 0 and hidden = 0";
             } else {
-                $query = "SELECT * FROM image WHERE id = :id";
+                $query = "SELECT * FROM image WHERE slug = :slug";
             }
 
             $stmt = $db->prepare($query);
 
-            $stmt->bindValue(':id', $id);
+            $stmt->bindValue(':slug', $slug);
 
             if ($stmt->execute()) {
                 $data = $stmt->fetch(PDO::FETCH_ASSOC);
-                $redis->set(RedisConfig::ONE_IMAGE . $id, serialize($data));
-                $redis->expire(RedisConfig::ONE_IMAGE . $id, 600);
+                $redis->set(RedisConfig::ONE_IMAGE . $slug, serialize($data));
+                $redis->expire(RedisConfig::ONE_IMAGE . $slug, 600);
                 return $data;
             } else {
                 return null;
             }
-        }else {
-            return unserialize($redis->get(RedisConfig::ONE_IMAGE . $id));
+        } else {
+            return unserialize($redis->get(RedisConfig::ONE_IMAGE . $slug));
         }
     }
 
@@ -101,6 +101,37 @@ class ImageModel implements RedisConfig
         }
     }
 
+    public function storeImageInGallery(array $data): bool
+    {
+        $redis = new Client();
+
+        $db = $this->conn->getConnection();
+
+        $getImageQuery = 'SELECT image.id FROM image WHERE user_id = :user_id AND slug = :slug';
+
+        $stmt1 = $db->prepare($getImageQuery);
+
+        $stmt1->bindValue(':user_id', $data['user_id']);
+        $stmt1->bindValue(':slug', $data['slug']);
+
+        $stmt1->execute();
+        $imageId = $stmt1->fetch(PDO::FETCH_ASSOC);
+
+        $query = "INSERT INTO image_gallery (image_id, gallery_id) VALUES (:image_id, :gallery_id)";
+
+        $stmt = $db->prepare($query);
+
+        $stmt->bindValue(':image_id', $imageId['id']);
+        $stmt->bindValue(':gallery_id', $data['gallery_id']);
+
+        if ($stmt->execute()) {
+            $redis->flushall();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function deleteImage($id): bool
     {
         $redis = new Client();
@@ -108,18 +139,33 @@ class ImageModel implements RedisConfig
         if ($redis->get(RedisConfig::ONE_IMAGE . $id)) {
             $redis->del(RedisConfig::ONE_IMAGE . $id);
         }
-
         $db = $this->conn->getConnection();
+
+        $getImageQuery = 'SELECT file_name FROM image WHERE id = :id';
+
+        $stmt1 = $db->prepare($getImageQuery);
+
+        $stmt1->bindValue(':id', $id);
+
+        $stmt1->execute();
+
+        $imagePath = $stmt1->fetch(PDO::FETCH_ASSOC);
+
 
         $stmt = $db->prepare("DELETE FROM image WHERE id = :id");
 
         $stmt->bindValue(':id', $id);
 
         if ($stmt->execute()) {
-            return true;
+            $redis->flushall();
+            try {
+                unlink($_SERVER['DOCUMENT_ROOT'] . '/images/' . $imagePath['file_name']);
+                return true;
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
         }
         return false;
-
     }
 
     public function updateImage($data): bool

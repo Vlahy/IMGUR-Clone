@@ -9,7 +9,6 @@
     if (isset($_SESSION['user_id'])) {
 
         echo '<div class="p-2"><button class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addGalleryModal">Add Gallery</button></div>';
-        echo '<div class="p-2"><button class="btn btn-outline-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addImageModal">Add Image</button></div>';
 
         if ($uri == '/users/profile/' . $_SESSION['user_id']) {
             echo '
@@ -88,26 +87,4 @@
     </div>
 </div>
 
-<!-- Modal for adding image -->
-<div class="modal fade" id="addImageModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Edit Gallery</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form enctype="multipart/form-data" name="upload" class="form" method="post" action="http://localhost/users/image/add">
-                    <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id'] ?>">
-                    <label for="image" class="form-label">Select image: </label>
-                    <input type="file" name="image" accept="image/jpeg, image/png">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button id="submit" type="submit" name="upload" value="submit" class="btn btn-primary">Upload</button>
-            </div>
-            </form>
-        </div>
-    </div>
-</div>
 

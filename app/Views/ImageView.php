@@ -9,7 +9,7 @@ if (isset($data) && $data != null && $data['image'] != false) {
     echo '<div class="col d-flex align-items-center justify-content-center mt-5">
             <div class="card" style="width: 340px">
             <img class="card-image-top mx-2 my-2"
-             src="' . $image['file_name'] . '?random=' . $image['id'] . '"
+             src="/images/' . $image['file_name']  . '"
               alt="' . $image['slug'] . '">';
 
     if (isset($_SESSION['user_id'])) {

@@ -24,6 +24,31 @@ if (isset($data) && $data != false && $data['info'] != null) {
         if ($_SESSION['user_id'] == $info['user_id']) {
             echo '<form class="d-inline" action="http://localhost/users/gallery/delete/' . $info["id"] . '" method="post">
             <button type="submit" class="btn btn-outline-danger">Delete</button></form>';
+            echo '
+<div class="p-2"><button class="btn btn-outline-primary m-2" data-bs-toggle="modal" data-bs-target="#addImageModal">Add Image</button></div>
+<!-- Modal for adding image -->
+<div class="modal fade" id="addImageModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Gallery</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form enctype="multipart/form-data" name="upload" class="form" method="post" action="http://localhost/users/image/add">
+                    <input type="hidden" name="user_id" value="' . $info['user_id'] . '">
+                    <input type="hidden" name="gallery_id" value="' . $info['id'] . '">
+                    <label for="image" class="form-label">Select image: </label>
+                    <input type="file" name="image" accept="image/jpeg, image/png, image/jpg, image/gif">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="submit" type="submit" name="upload" value="submit" class="btn btn-primary">Upload</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>';
         }
         if ($_SESSION['user_id'] == $info['user_id'] || $_SESSION['role'] == 'admin') {
             echo '<button type="button" class="btn btn-outline-primary m-2" data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</button>';
@@ -46,18 +71,18 @@ if (isset($data) && $data != false && $data['info'] != null) {
     foreach ($data['gallery'] as $value) {
         if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != $value->user_id) {
             if ($value->nsfw == 0 && $value->hidden == 0) {
-                echo '<div class="col-sm-4 align-items-center"><div class="card" style="width: 340px"><a href="http://localhost/users/image/' . $value->id .
+                echo '<div class="col-sm-4 align-items-center"><div class="card" style="width: 340px"><a href="http://localhost/users/image/' . $value->slug .
                     '"><img class="card-image-top mx-2 my-2"
-             src="' . $value->file_name . '?random=' . $value->id . '"
+             src="/images/' . $value->file_name . '"
               alt="' . $value->slug . '"></a>
               
               </div>
               </div>';
             }
         } else {
-            echo '<div class="col-sm-4 d-flex align-items-center justify-content-center"><div class="card" style="width: 340px"><a href="http://localhost/users/image/' . $value->id .
-                '"><img class="card-image-top m-2"
-             src="' . $value->file_name . '?random=' . $value->id . '"
+            echo '<div class="col-sm-4 d-flex align-items-center justify-content-center"><div class="card" style="width: 340px"><a href="http://localhost/users/image/' . $value->slug .
+                '"><img class="card-image-top m-2" style="width: 320px; height: 240px"
+             src="/images/' . $value->file_name . '"
               alt="' . $value->slug . '"></a>
               </div>
               </div>';
