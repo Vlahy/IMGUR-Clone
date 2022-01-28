@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Enums\UserRoleData as Role;
 use Config\Database;
+use PDO;
 
 class UserModel implements Role
 {
@@ -30,7 +31,7 @@ class UserModel implements Role
         $stmt->bindValue(':email', $data['email']);
         $stmt->bindValue(':password', $data['password']);
         $stmt->bindValue(':api_key', base64_encode('secret'));
-        $stmt->bindValue(':role', Role::ROLES[self::USER]);
+        $stmt->bindValue(':role', 'user');
 
         if ($stmt->execute()) {
             return true;
@@ -179,6 +180,57 @@ class UserModel implements Role
             return false;
         }
 
+    }
+
+    /**
+     * Method for getting user data
+     *
+     * @param int $id
+     *
+     * @return array|false
+     */
+    public function getUserData(int $id)
+    {
+
+        if (!isset($id)){
+            return false;
+        }
+
+        $db = $this->conn->getConnection();
+
+        $query = "SELECT id, username FROM user WHERE id = :id";
+
+        $stmt = $db->prepare($query);
+
+        $stmt->bindValue(':id', $id);
+
+        if ($stmt->execute()){
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            return false;
+        }
+
+    }
+
+    public function getUserIdByEmail(string $email)
+    {
+        if (!isset($email)){
+            return false;
+        }
+
+        $db = $this->conn->getConnection();
+
+        $query = "SELECT id FROM user WHERE email = :email";
+
+        $stmt = $db->prepare($query);
+
+        $stmt->bindValue(':email', $email);
+
+        if ($stmt->execute()){
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            return false;
+        }
     }
 
 }

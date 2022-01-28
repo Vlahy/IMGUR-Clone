@@ -13,7 +13,7 @@ class ChangeDatabase
 
     public function __construct()
     {
-        $this->conn = new Database();
+        $this->conn = Database::getInstance();
     }
 
     public function passwordHash(): string

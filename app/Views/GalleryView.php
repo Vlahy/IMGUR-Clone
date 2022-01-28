@@ -25,7 +25,7 @@ if (isset($data) && $data != false && $data['info'] != null) {
             echo '<form class="d-inline" action="http://localhost/users/gallery/delete/' . $info["id"] . '" method="post">
             <button type="submit" class="btn btn-outline-danger">Delete</button></form>';
             echo '
-<div class="p-2"><button class="btn btn-outline-primary m-2" data-bs-toggle="modal" data-bs-target="#addImageModal">Add Image</button></div>
+<button class="btn btn-outline-primary m-2" data-bs-toggle="modal" data-bs-target="#addImageModal">Add Image</button>
 <!-- Modal for adding image -->
 <div class="modal fade" id="addImageModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -112,11 +112,11 @@ if (isset($data) && $data != false && $data['info'] != null) {
                 </div>
                 </div>';
     }
-    if (isset($data['comment'])){
-        if ($data['comment'] == null){
+    if (isset($data['comment'])) {
+        if ($data['comment'] == null) {
             $comments[] = [
-                    'username' => '',
-                    'comment' => 'Comments do not exist!',
+                'username' => '',
+                'comment' => 'Comments do not exist!',
             ];
         } else {
             $comments = $data['comment'];
@@ -126,7 +126,7 @@ if (isset($data) && $data != false && $data['info'] != null) {
                 <div class="card">
                 <h4 class="card-header">Comments</h4>
                 <div class="card-body">';
-        foreach ($comments as $comment){
+        foreach ($comments as $comment) {
             echo '<h5 class="card-title">' . $comment["username"] . '</h5>
                     <p class="card-text">' . $comment["comment"] . '</p><hr>';
         }

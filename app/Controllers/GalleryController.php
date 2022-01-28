@@ -15,14 +15,21 @@ class GalleryController extends BaseController
     private LoggerController $logger;
     private UserModel $userModel;
     private CommentController $comment;
+    private SubscriptionController $subscriptionController;
 
-    public function __construct(GalleryModel $galleryModel, LoggerController $loggerController, UserModel $userModel, CommentController $commentController)
+    public function __construct(GalleryModel $galleryModel,
+                                LoggerController $loggerController,
+                                UserModel $userModel,
+                                CommentController $commentController,
+                                SubscriptionController $subscriptionController
+    )
     {
         $this->galleryModel = $galleryModel;
         $this->pagination = new Pagination($this->table);
         $this->logger = $loggerController;
         $this->userModel = $userModel;
         $this->comment = $commentController;
+        $this->subscriptionController = $subscriptionController;
     }
 
     /**
@@ -42,7 +49,14 @@ class GalleryController extends BaseController
         $offset = $this->pagination->offset();
         $limit = $this->pagination->limit();
 
-        $data = $this->galleryModel->listGalleries($id, $limit, $offset, $hide);
+        $data['galleries'] = $this->galleryModel->listGalleries($id, $limit, $offset, $hide);
+        $data['user_info'] = $this->userModel->getUserData($id);
+        $data['subscription_info'] = $this->subscriptionController->getCurrentSubscription($id);
+        $data['subscription_history'] = $this->subscriptionController->getSubscriptionHistory($id);
+
+        if (empty($data['user_info'])){
+            header('Location: /404');
+        }
 
         $this->view('UserListGalleryView', $data);
     }
@@ -50,7 +64,7 @@ class GalleryController extends BaseController
     /**
      * Method for showing one gallery
      *
-     * @param $slug
+     * @param $id
      * @return void
      */
     public function show($id)
@@ -156,9 +170,10 @@ class GalleryController extends BaseController
             $this->galleryModel->deleteGallery($id);
             header('Location: /users/profile/' . $_SESSION['user_id']);
         } catch (\Exception $e) {
-            return json_encode([
-                'error' => $e->getMessage(),
-            ]);
+            header('Location: /');
+//            return json_encode([
+//                'error' => $e->getMessage(),
+//            ]);
         }
     }
 
