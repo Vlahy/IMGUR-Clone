@@ -1,7 +1,9 @@
 <?php
 
+use App\Controllers\AuthController;
 use App\Controllers\GalleryController;
 use App\Controllers\ImageController;
+use App\Controllers\SubscriptionController;
 use Bramus\Router\Router;
 use Config\Database;
 use DI\Container;
@@ -23,11 +25,17 @@ $router->get('/', function () use ($container) {
     $container->get(ImageController::class)->listAllImages();
 });
 
-$router->match('GET|POST','/users/register', 'App\Controllers\AuthController@register');
+$router->match('GET|POST', '/users/register', function () use ($container) {
+    $container->get(AuthController::class)->register();
+});
 
-$router->match('GET|POST', '/users/login', 'App\Controllers\AuthController@login');
+$router->match('GET|POST', '/users/login', function () use ($container) {
+    $container->get(AuthController::class)->login();
+});
 
-$router->get('/users/logout', 'App\Controllers\AuthController@logout');
+$router->get('/users/logout', function () use ($container) {
+    $container->get(AuthController::class)->logout();
+});
 
 $router->get('/users/profile/{id}', function ($id) use ($container) {
     $container->get(GalleryController::class)->index($id);
@@ -61,19 +69,19 @@ $router->post('/users/image/add', function () use ($container) {
     $container->get(ImageController::class)->store();
 });
 
-$router->get('/users/gallery/delete/{id}', function ($id) use ($container) {
+$router->post('/users/gallery/delete/{id}', function ($id) use ($container) {
     $container->get(GalleryController::class)->delete($id);
 });
 
-$router->get('/users/gallery/nsfw/{id}', function ($id) use ($container) {
+$router->post('/users/gallery/nsfw/{id}', function ($id) use ($container) {
     $container->get(GalleryController::class)->setGalleryAsNsfw($id);
 });
 
-$router->get('/users/gallery/hidden/{id}', function ($id) use ($container) {
+$router->post('/users/gallery/hidden/{id}', function ($id) use ($container) {
     $container->get(GalleryController::class)->setGalleryAsHidden($id);
 });
 
-$router->get('/users/gallery/update', function () use ($container) {
+$router->post('/users/gallery/update', function () use ($container) {
     $container->get(GalleryController::class)->update();
 });
 
@@ -95,5 +103,21 @@ $router->before('GET|POST','/admin/.*', function () {
 $router->get('/admin/panel', 'App\Controllers\AdminController@listLoggerData');
 
 $router->post('/admin/changeRole', 'App\Controllers\AdminController@changeRole');
+
+$router->get('/users/subscriptionForm', function () use ($container) {
+    $container->get(SubscriptionController::class)->create();
+});
+
+$router->post('/users/subscriptionFormSubmit', function () use ($container) {
+    $container->get(SubscriptionController::class)->store();
+});
+
+$router->post('/users/cancelSubscription', function () use ($container) {
+    $container->get(SubscriptionController::class)->cancelSubscription();
+});
+
+$router->post('/users/changeSubscription', function () use ($container) {
+    $container->get(SubscriptionController::class)->changeSubscriptionType();
+});
 
 $router->run();

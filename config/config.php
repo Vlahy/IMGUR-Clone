@@ -12,6 +12,10 @@ const LOGIN_URL = 'http://localhost/users/login';
 const LOGOUT_URL = 'http://localhost/users/logout';
 define('PROFILE_URL', 'http://localhost/users/profile/' . $id);
 const HOME_URL = 'http://localhost/';
+const SUBSCRIBE_PAGE_URL = HOME_URL . 'users/subscriptionForm';
+const SUBSCRIBE_FORM_SUBMIT = HOME_URL . 'users/subscriptionFormSubmit';
+const CANCEL_SUBSCRIPTION = HOME_URL . 'users/cancelSubscription';
+const CHANGE_SUBSCRIPTION_TYPE = HOME_URL . 'users/changeSubscription';
 
 define('HEADER', $_SERVER['DOCUMENT_ROOT'] . '/../app/Helpers/header.php');
 define('NAVIGATION', $_SERVER['DOCUMENT_ROOT'] . '/../app/Helpers/navigation.php');

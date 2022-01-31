@@ -10,10 +10,12 @@ class AuthController extends BaseController implements RedisConfig
 {
 
     private UserModel $userModel;
+    private SubscriptionController $subscriptionController;
 
-    public function __construct()
+    public function __construct(UserModel $userModel, SubscriptionController $subscriptionController)
     {
-        $this->userModel = new UserModel();
+        $this->userModel = $userModel;
+        $this->subscriptionController = $subscriptionController;
     }
 
     /**
@@ -99,6 +101,7 @@ class AuthController extends BaseController implements RedisConfig
                 $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
 
                 if ($this->userModel->register($data)) {
+                    $this->subscriptionController->storeOnRegister($data['email']);
                     header('location: /users/login');
                 } else {
                     die([

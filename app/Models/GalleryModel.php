@@ -127,7 +127,7 @@ class GalleryModel implements RedisConfig
     {
 
         if ($this->redis->get(RedisConfig::ONE_GALLERY . $id)) {
-            $this->redis->del(RedisConfig::ONE_GALLERY . $id);
+            $this->redis->flushall();
         }
 
         $db = $this->conn->getConnection();
@@ -150,7 +150,7 @@ class GalleryModel implements RedisConfig
     {
 
         if ($this->redis->get(RedisConfig::ONE_GALLERY . $data['id'])) {
-            $this->redis->del(RedisConfig::ONE_GALLERY . $data['id']);
+            $this->redis->flushall();
         }
 
         $db = $this->conn->getConnection();
@@ -173,7 +173,7 @@ class GalleryModel implements RedisConfig
     {
 
         if ($this->redis->get(RedisConfig::ONE_GALLERY . $id)) {
-            $this->redis->del(RedisConfig::ONE_GALLERY . $id);
+            $this->redis->flushall();
         }
 
         $db = $this->conn->getConnection();
@@ -193,7 +193,7 @@ class GalleryModel implements RedisConfig
     {
 
         if ($this->redis->get(RedisConfig::ONE_GALLERY . $id)) {
-            $this->redis->del(RedisConfig::ONE_GALLERY . $id);
+            $this->redis->flushall();
         }
 
         $db = $this->conn->getConnection();

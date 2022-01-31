@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Helpers\Slugify;
 use App\Models\CommentModel;
 use App\Models\ImageModel;
+use App\Models\SubscriptionModel;
 use App\Models\UserModel;
 
 class ImageController extends BaseController
@@ -16,14 +17,20 @@ class ImageController extends BaseController
     private Pagination $pagination;
     private CommentController $commentController;
     private ImageModel $imageModel;
+    private SubscriptionModel $subscriptionModel;
 
-    public function __construct(ImageModel $imageModel, CommentController $commentController, LoggerController $loggerController, UserModel $userModel)
+    public function __construct(ImageModel $imageModel,
+                                CommentController $commentController,
+                                LoggerController $loggerController,
+                                UserModel $userModel,
+                                SubscriptionModel $subscriptionModel)
     {
         $this->imageModel = $imageModel;
         $this->commentController = $commentController;
         $this->logger = $loggerController;
         $this->userModel = $userModel;
         $this->pagination = new Pagination($this->table);
+        $this->subscriptionModel = $subscriptionModel;
     }
 
 
@@ -83,10 +90,15 @@ class ImageController extends BaseController
     public function store(): bool
     {
 
-        // Could not finish this task on time, will finish today. Date 17.01.2022. 10:30
         $data = [];
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            $maxUploads = $this->subscriptionModel->getMonthlyLimit($_POST['user_id']);
+            $uploaded = $this->subscriptionModel->checkCurrentUploadLimit($_POST['user_id']);
+            if ((int)$maxUploads['monthly_limit'] <= (int)$uploaded['uploaded_images']){
+                die(json_encode(array('error' => 'You have reached monthly limit for image uploads!')));
+            }
 
             if (isset($_FILES['image']) && $_FILES['image']['error'] == UPLOAD_ERR_OK){
 
@@ -118,16 +130,17 @@ class ImageController extends BaseController
 
                             $this->imageModel->storeImageInGallery($data);
 
+                            $this->subscriptionModel->incrementImageLimit($_POST['user_id']);
+
                             header('Location: /users/gallery/' . $data['gallery_id']);
                         } catch (\Exception $e) {
-                            header('Location: /');
                             return json_encode([
                                 'error' => $e->getMessage(),
                                 'code' => $e->getCode(),
                             ]);
                         }
                     } else {
-                        header('Location: /users/profile/3');
+                        die();
                     }
                 }
             }
