@@ -5,7 +5,7 @@ namespace App\Interfaces;
 interface PaymentInterface
 {
 
-    public function checkPayment();
+    public function validateCard(int $id);
 
-    public function doPayment();
+    public function doPayment(bool $isValid);
 }

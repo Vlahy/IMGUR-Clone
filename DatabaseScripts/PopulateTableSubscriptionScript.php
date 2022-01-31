@@ -56,10 +56,32 @@ class PopulateTableSubscriptionScript
 
     }
 
+    public function insertPaymentData()
+    {
+
+        $db = $this->conn->getConnection();
+
+        $query = "INSERT INTO user_payment (user_id, payment_type, is_valid) VALUES (:user_id, :payment_type, :is_valid)";
+
+        $numOfUsers = $this->getUsersCount();
+
+        foreach ($numOfUsers as $userId) {
+            $stmt = $db->prepare($query);
+            $stmt->bindValue(':user_id', $userId['id']);
+            $stmt->bindValue(':payment_type', 'VisaCreditCard');
+            $stmt->bindValue(':is_valid', rand(0,1));
+            $stmt->execute();
+        }
+
+    }
+
 }
 
 Database::connection();
 
-$num = new PopulateTableSubscriptionScript();
+$test = new PopulateTableSubscriptionScript();
 
-$num->insertSubscriptions();
+echo "Populating user_subscriptions table.".PHP_EOL;
+$test->insertSubscriptions();
+echo "Populating user_payment table".PHP_EOL;
+$test->insertPaymentData();

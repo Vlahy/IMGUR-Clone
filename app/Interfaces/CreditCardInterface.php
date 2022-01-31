@@ -5,8 +5,8 @@ namespace App\Interfaces;
 interface CreditCardInterface
 {
 
-    public function validateCard();
+    public function validateCard(int $id);
 
-    public function doPayment();
+    public function doPayment(bool $isValid);
 
 }

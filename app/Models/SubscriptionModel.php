@@ -404,8 +404,9 @@ class SubscriptionModel implements SubscriptionInterface, SubscriptionTypes
             $update->execute();
 
             $insert = $db->prepare("INSERT INTO user_subscriptions (user_id, subscription_type, start_date, end_date, is_active, monthly_limit, uploaded_images)
-                                                VALUES (131, 'twelve_months', :start_date, :end_date, true, 50, 0)");
+                                                VALUES (:user_id, 'twelve_months', :start_date, :end_date, true, :monthly_limit, :uploaded_images)");
 
+            $insert->bindValue(':user_id', $data['user_id']);
             $insert->bindValue(':start_date', $dateAndLimit['date']['start_date']);
             $insert->bindValue(':end_date', $dateAndLimit['date']['end_date']);
             $insert->bindValue(':monthly_limit', $dateAndLimit['monthlyLimit']);
