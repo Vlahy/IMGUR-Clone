@@ -20,12 +20,13 @@ class VisaCreditCard implements CreditCardInterface
      * Method for checking if credit card is valid
      *
      * @param int $id
+     *
      * @return bool
      */
     public function validateCard(int $id): bool
     {
 
-        if (!isset($id)){
+        if (!isset($id)) {
             return false;
         }
 
@@ -39,27 +40,29 @@ class VisaCreditCard implements CreditCardInterface
 
         if ($stmt->execute()) {
 
-            $is_valid = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $is_valid = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($is_valid[0]['is_valid'] == 1) {
-                return true;
-            } else {
-                return false;
-            }
-        }else {
+                if ($is_valid['is_valid'] == true) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+        } else {
             return false;
         }
 
     }
 
-    public function doPayment(bool $isValid)
+    public function doPayment(int $id)
     {
-        if ($isValid === false){
-            echo 'Your payment was not successful, subscription is revoked.'.PHP_EOL;
-        } elseif ($isValid === true) {
-            echo 'Your payment was successful, subscription is renewed.'.PHP_EOL;
-        }else {
-            echo 'There was a problem, please try again.';
+
+        $isValid = $this->validateCard($id);
+
+        if ($isValid === true) {
+            echo 'Your payment was successful, subscription is renewed.' . PHP_EOL;
+        } else {
+            echo 'Your payment was not successful, subscription is revoked.' . PHP_EOL;
         }
     }
 }

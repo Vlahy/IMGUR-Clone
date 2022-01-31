@@ -12,7 +12,7 @@ Database::connection();
 
 function currentDate()
 {
-    $date = new DateTime('now');
+    $date = new DateTime();
 
     return $date->format('Y-m-d H:m:s');
 }
@@ -23,7 +23,10 @@ function getAllUsers()
 
     $db = $instance->getConnection();
 
-    $query = "SELECT id, email FROM user";
+    // Uncomment this line if You want to test payment for all users and comment out next query
+    $query = "SELECT id AS user_id FROM user";
+
+    // Uncomment this line if You want to test payment for users that have expired subscriptions and comment out previous query
 //    $query = "SELECT user_id FROM user_subscriptions WHERE start_date = :date OR end_date < :date AND is_active = true AND subscription_type != 'free'";
 
 
@@ -43,9 +46,10 @@ function paySubscription(PaymentInterface $payment)
     foreach ($getUsers as $user){
 
         echo '----------------'.PHP_EOL;
-        echo 'User id: ' . $user['user_id']. PHP_EOL;
 
-        $payment->doPayment(true);
+
+        $payment->doPayment($user['user_id']);
+
 
     }
 }
