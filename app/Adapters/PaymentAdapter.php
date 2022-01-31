@@ -15,13 +15,13 @@ class PaymentAdapter implements PaymentInterface
         $this->creditCard = $creditCard;
     }
 
-    public function checkPayment()
+    public function validateCard(int $id)
     {
-        $this->creditCard->validateCard();
+        $this->creditCard->validateCard($id);
     }
 
-    public function doPayment()
+    public function doPayment(bool $isValid)
     {
-        $this->creditCard->doPayment();
+        $this->creditCard->doPayment($isValid);
     }
 }
